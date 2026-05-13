@@ -669,8 +669,10 @@ function update(){
   ['start','end'].forEach(k=>{
     const el=v('grad-'+k); if(el) { const span=v('grad-'+k+'-val'); if(span) span.textContent=el.value; }
   });
-  v('email-frame').innerHTML = buildHTML();
-const isMob = v('email-frame').classList.contains('mobile');
+  const frame = v('email-frame');
+frame.innerHTML = '';          // 먼저 완전히 비우고
+frame.innerHTML = buildHTML(); // 새로 렌더링
+const isMob = frame.classList.contains('mobile');
 applyMobileCardStyles(isMob);
 }
 
