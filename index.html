@@ -395,19 +395,25 @@ function setDevice(d){
 function applyMobileCardStyles(isMobile){
   const frame = v('email-frame');
   if(!frame) return;
-  frame.querySelectorAll('.card-td').forEach((td,i) => {
+
+  // 카드를 감싸는 부모 tr도 함께 제어
+  frame.querySelectorAll('.card-td').forEach((td, i) => {
     if(isMobile){
       td.style.display = 'block';
       td.style.width = '100%';
       td.style.paddingRight = '0';
       td.style.marginBottom = '10px';
+      // 부모 tr을 block으로 전환해서 table 3열 구조 해제
+      if(td.parentElement) td.parentElement.style.display = 'block';
     } else {
       td.style.display = '';
       td.style.width = '31%';
       td.style.paddingRight = i < 2 ? '8px' : '';
       td.style.marginBottom = '';
+      if(td.parentElement) td.parentElement.style.display = '';
     }
   });
+
   frame.querySelectorAll('.card-icon').forEach(icon => {
     if(isMobile){
       icon.style.width = '36px';
