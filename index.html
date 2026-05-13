@@ -513,7 +513,13 @@ function buildHTML(){
     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%"><tr>
     ${cards.map((c,i)=>`<td width="31%" class="card-td" style="vertical-align:top;${i<2?'padding-right:8px;':''}">
       <div style="background:${cardBg};border-radius:12px;padding:16px;border:1px solid #e3e8ee;">
-        <div class="card-icon" style="width:40px;height:40px;background:${primary}18;border-radius:50%;margin-bottom:12px;font-size:20px;line-height:40px;text-align:center;display:block;">${esc(c.icon)}</div>
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-bottom:12px;">
+  <tr>
+    <td class="card-icon" width="40" height="40" style="width:40px;height:40px;background:${primary}18;border-radius:50%;text-align:center;vertical-align:middle;font-size:20px;line-height:1;">
+      ${esc(c.icon)}
+    </td>
+  </tr>
+</table>
         <p style="margin:0 0 4px;font-size:10px;font-weight:600;color:#64748d;letter-spacing:0.5px;text-transform:uppercase;">${esc(c.label)}</p>
         <p style="margin:0 0 6px;font-size:13px;font-weight:500;color:#0d253d;">${esc(c.title)}</p>
         <p style="margin:0;font-size:11px;font-weight:300;color:#64748d;line-height:1.5;word-break:keep-all;overflow-wrap:break-word;">${esc(c.body)}</p>
