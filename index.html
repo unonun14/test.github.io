@@ -387,7 +387,40 @@ function switchTab(name){
 function setDevice(d){
   document.querySelectorAll('.device-btn').forEach(b=>b.classList.remove('active'));
   event.target.classList.add('active');
-  v('email-frame').classList.toggle('mobile', d==='mobile');
+  const frame = v('email-frame');
+  frame.classList.toggle('mobile', d==='mobile');
+  applyMobileCardStyles(d==='mobile');
+}
+
+function applyMobileCardStyles(isMobile){
+  const frame = v('email-frame');
+  if(!frame) return;
+  frame.querySelectorAll('.card-td').forEach((td,i) => {
+    if(isMobile){
+      td.style.display = 'block';
+      td.style.width = '100%';
+      td.style.paddingRight = '0';
+      td.style.marginBottom = '10px';
+    } else {
+      td.style.display = '';
+      td.style.width = '31%';
+      td.style.paddingRight = i < 2 ? '8px' : '';
+      td.style.marginBottom = '';
+    }
+  });
+  frame.querySelectorAll('.card-icon').forEach(icon => {
+    if(isMobile){
+      icon.style.width = '36px';
+      icon.style.height = '36px';
+      icon.style.fontSize = '18px';
+      icon.style.lineHeight = '36px';
+    } else {
+      icon.style.width = '40px';
+      icon.style.height = '40px';
+      icon.style.fontSize = '20px';
+      icon.style.lineHeight = '40px';
+    }
+  });
 }
 
 // 색상 미리보기 값 동기
@@ -637,6 +670,8 @@ function update(){
     const el=v('grad-'+k); if(el) { const span=v('grad-'+k+'-val'); if(span) span.textContent=el.value; }
   });
   v('email-frame').innerHTML = buildHTML();
+const isMob = v('email-frame').classList.contains('mobile');
+applyMobileCardStyles(isMob);
 }
 
 function getFullHTML(){
