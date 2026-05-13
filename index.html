@@ -226,6 +226,9 @@
     <div class="field-group"><label>회사명</label><input type="text" id="f-company" value="메가인포경영자문그룹" oninput="update()"></div>
     <div class="field-group"><label>주소 / 연락처</label><textarea id="f-address" oninput="update()">서울특별시 금천구
 megainfo@example.com</textarea></div>
+    <div class="field-group"><label>수신거부 링크 URL</label><input type="text" id="f-unsub-url" value="#" oninput="update()"></div>
+    <div class="field-group"><label>개인정보처리방침 링크 URL</label><input type="text" id="f-privacy-url" value="#" oninput="update()"></div>
+    <div class="field-group"><label>저작권 표시 텍스트</label><input type="text" id="f-copyright" value="© 2026 Megainfo. All rights reserved." oninput="update()"></div>
   </div>
 
   <!-- 디자인 탭 -->
@@ -504,10 +507,10 @@ function buildHTML(){
       </td>
       <td align="right" style="vertical-align:top;">
         <p style="margin:0 0 8px;font-size:10px;color:#64748d;">
-          <a href="#" style="color:${primary};text-decoration:none;">수신거부</a> &nbsp;·&nbsp;
-          <a href="#" style="color:${primary};text-decoration:none;">개인정보처리방침</a>
+          <a href="${val('f-unsub-url')||'#'}" style="color:${primary};text-decoration:none;">수신거부</a> &nbsp;·&nbsp;
+          <a href="${val('f-privacy-url')||'#'}" style="color:${primary};text-decoration:none;">개인정보처리방침</a>
         </p>
-        <p style="margin:0;font-size:10px;color:#a0aec0;">© 2026 Megainfo. All rights reserved.</p>
+        <p style="margin:0;font-size:10px;color:#a0aec0;">${esc(val('f-copyright')||'© 2026 Megainfo. All rights reserved.')}</p>
       </td>
     </tr></table>
   </td></tr>`;
@@ -521,7 +524,7 @@ function buildHTML(){
 const PRESET_KEY = 'megainfo_presets';
 const SAVE_IDS = ['f-logo','f-tag','f-eyebrow','f-title','f-subtitle','f-body','f-cta','f-cta-url',
   'c1-title','c1-body','c2-title','c2-body','c3-title','c3-body',
-  'f-banner-title','f-banner-body','f-company','f-address',
+  'f-banner-title','f-banner-body','f-company','f-address','f-unsub-url','f-privacy-url','f-copyright',
   'color-primary','color-dark','grad-start','grad-end','color-card',
   'font-title','font-body','header-pad','max-width','border-radius',
   'show-header','show-hero','show-body','show-cta','show-cards','show-banner','show-footer',
