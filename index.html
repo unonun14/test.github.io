@@ -590,12 +590,17 @@ function loadPreset(idx){
   const presets = getPresets();
   const p = presets[idx];
   if(!p) return;
+
   SAVE_IDS.forEach(id => {
     const el = v(id);
     if(!el || !(id in p.data)) return;
-    if(el.type === 'checkbox') el.checked = p.data[id];
-    else el.value = p.data[id];
+    if(el.type === 'checkbox'){
+      el.checked = p.data[id];
+    } else {
+      el.value = p.data[id];
+    }
   });
+
   if(p.data['__logoDataURL']){
     window._logoDataURL = p.data['__logoDataURL'];
     const preview = v('logo-preview-img');
@@ -607,7 +612,9 @@ function loadPreset(idx){
     const wrap = v('logo-preview-wrap');
     if(wrap) wrap.style.display = 'none';
   }
-  update();
+
+  // 모든 값 세팅 후 단 한 번만 렌더링
+  requestAnimationFrame(() => update());
 }
 
 function deletePreset(idx, e){
