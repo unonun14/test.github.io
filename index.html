@@ -685,38 +685,28 @@ function copyHTML(){
   const orig = btn.textContent;
 
   try {
-    // 기존 선택 초기화
     const selection = window.getSelection();
     selection.removeAllRanges();
 
-    // email-frame 영역 선택
+    // <style> 태그 제외하고 첫 번째 table만 선택
+    const table = frame.querySelector('table');
+    if(!table) throw new Error('no table');
+
     const range = document.createRange();
-    range.selectNodeContents(frame);
+    range.selectNodeContents(table);
     selection.addRange(range);
 
-    // 복사 실행
     document.execCommand('copy');
-
-    // 선택 해제
     selection.removeAllRanges();
 
     btn.textContent = '✅ 복사됨!';
     setTimeout(() => btn.textContent = orig, 2000);
   } catch(e) {
-    // 실패 시 기존 HTML 코드 복사로 폴백
     navigator.clipboard.writeText(getFullHTML()).then(() => {
       btn.textContent = '✅ 복사됨!';
       setTimeout(() => btn.textContent = orig, 2000);
     });
   }
-}
-
-function downloadHTML(){
-  const blob = new Blob([getFullHTML()], {type:'text/html'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'megainfo_email_template.html';
-  a.click();
 }
 
 
