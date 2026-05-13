@@ -396,21 +396,40 @@ function applyMobileCardStyles(isMobile){
   const frame = v('email-frame');
   if(!frame) return;
 
-  // 카드를 감싸는 부모 tr도 함께 제어
   frame.querySelectorAll('.card-td').forEach((td, i) => {
     if(isMobile){
       td.style.display = 'block';
       td.style.width = '100%';
+      td.style.maxWidth = '100%';
+      td.style.boxSizing = 'border-box';
       td.style.paddingRight = '0';
       td.style.marginBottom = '10px';
-      // 부모 tr을 block으로 전환해서 table 3열 구조 해제
-      if(td.parentElement) td.parentElement.style.display = 'block';
+      // card-td 직계: tr → tbody → 카드 3개 wrapper table 까지만 (3단계)
+      const tr = td.parentElement;
+      const tbody = tr && tr.parentElement;
+      const cardTable = tbody && tbody.parentElement;
+      if(tr) tr.style.display = 'block';
+      if(tbody) tbody.style.display = 'block';
+      if(cardTable && cardTable.tagName === 'TABLE'){
+        cardTable.style.display = 'block';
+        cardTable.style.width = '100%';
+      }
     } else {
       td.style.display = '';
       td.style.width = '31%';
+      td.style.maxWidth = '';
+      td.style.boxSizing = '';
       td.style.paddingRight = i < 2 ? '8px' : '';
       td.style.marginBottom = '';
-      if(td.parentElement) td.parentElement.style.display = '';
+      const tr = td.parentElement;
+      const tbody = tr && tr.parentElement;
+      const cardTable = tbody && tbody.parentElement;
+      if(tr) tr.style.display = '';
+      if(tbody) tbody.style.display = '';
+      if(cardTable && cardTable.tagName === 'TABLE'){
+        cardTable.style.display = '';
+        cardTable.style.width = '';
+      }
     }
   });
 
@@ -419,15 +438,18 @@ function applyMobileCardStyles(isMobile){
       icon.style.width = '36px';
       icon.style.height = '36px';
       icon.style.fontSize = '18px';
-      icon.style.lineHeight = '36px';
+      icon.style.lineHeight = '1';
     } else {
       icon.style.width = '40px';
       icon.style.height = '40px';
       icon.style.fontSize = '20px';
-      icon.style.lineHeight = '40px';
+      icon.style.lineHeight = '1';
     }
   });
 }
+
+
+
 
 // 색상 미리보기 값 동기
 ['primary','dark','card'].forEach(k=>{
@@ -467,9 +489,9 @@ function buildHTML(){
   if(showHeader) html += `
   <tr><td style="background:${grad};padding:${hPad}px ${hPad}px ${parseInt(hPad)-4}px ${hPad}px;">
     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%"><tr>
-      <td><div style="display:inline-block;background:rgba(255,255,255,0.18);border-radius:8px;padding:6px 14px;">
+      <td><div style="display:inline-block;background:rgba(255,255,255,0.18);border-radius:8px;padding:4px 10px;vertical-align:middle;">
         ${window._logoDataURL
-          ? `<img src="${window._logoDataURL}" style="max-height:32px;max-width:140px;width:auto;height:auto;vertical-align:middle;display:block;">`
+          ? `<img src="__LOGO_PLACEHOLDER__" style="display:block;width:auto;height:24px;max-height:24px;max-width:120px;object-fit:contain;">`
           : `<span style="font-size:13px;font-weight:700;color:#fff;letter-spacing:-0.3px;">${esc(val('f-logo'))}</span>`
         }
       </div></td>
@@ -513,13 +535,7 @@ function buildHTML(){
     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%"><tr>
     ${cards.map((c,i)=>`<td width="31%" class="card-td" style="vertical-align:top;${i<2?'padding-right:8px;':''}">
       <div style="background:${cardBg};border-radius:12px;padding:16px;border:1px solid #e3e8ee;">
-        <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-bottom:12px;">
-  <tr>
-    <td class="card-icon" width="40" height="40" style="width:40px;height:40px;background:${primary}18;border-radius:50%;text-align:center;vertical-align:middle;font-size:20px;line-height:1;">
-      ${esc(c.icon)}
-    </td>
-  </tr>
-</table>
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin-bottom:12px;"><tr><td class="card-icon" width="40" height="40" style="width:40px;height:40px;background:${primary}18;border-radius:50%;text-align:center;vertical-align:middle;font-size:20px;line-height:1;">${esc(c.icon)}</td></tr></table>
         <p style="margin:0 0 4px;font-size:10px;font-weight:600;color:#64748d;letter-spacing:0.5px;text-transform:uppercase;">${esc(c.label)}</p>
         <p style="margin:0 0 6px;font-size:13px;font-weight:500;color:#0d253d;">${esc(c.title)}</p>
         <p style="margin:0;font-size:11px;font-weight:300;color:#64748d;line-height:1.5;word-break:keep-all;overflow-wrap:break-word;">${esc(c.body)}</p>
@@ -602,17 +618,12 @@ function loadPreset(idx){
   const presets = getPresets();
   const p = presets[idx];
   if(!p) return;
-
   SAVE_IDS.forEach(id => {
     const el = v(id);
     if(!el || !(id in p.data)) return;
-    if(el.type === 'checkbox'){
-      el.checked = p.data[id];
-    } else {
-      el.value = p.data[id];
-    }
+    if(el.type === 'checkbox') el.checked = p.data[id];
+    else el.value = p.data[id];
   });
-
   if(p.data['__logoDataURL']){
     window._logoDataURL = p.data['__logoDataURL'];
     const preview = v('logo-preview-img');
@@ -624,9 +635,7 @@ function loadPreset(idx){
     const wrap = v('logo-preview-wrap');
     if(wrap) wrap.style.display = 'none';
   }
-
-  // 모든 값 세팅 후 단 한 번만 렌더링
-  requestAnimationFrame(() => update());
+  update();
 }
 
 function deletePreset(idx, e){
@@ -659,10 +668,17 @@ function handleLogoUpload(e){
   if(!file) return;
   const reader = new FileReader();
   reader.onload = function(ev){
-    window._logoDataURL = ev.target.result;
+    let dataURL = ev.target.result;
+    // SVG: base64로 강제 인코딩해서 DOM 파싱 방지
+    if(file.type === 'image/svg+xml'){
+      const svgText = atob(dataURL.split(',')[1]);
+      const encoded = encodeURIComponent(svgText);
+      dataURL = 'data:image/svg+xml,' + encoded;
+    }
+    window._logoDataURL = dataURL;
     const preview = document.getElementById('logo-preview-img');
     const wrap = document.getElementById('logo-preview-wrap');
-    if(preview) preview.src = ev.target.result;
+    if(preview) preview.src = dataURL;
     if(wrap) wrap.style.display = 'block';
     update();
   };
@@ -681,7 +697,6 @@ function clearLogo(){
 }
 
 function update(){
-  // 색상 값 표시 업데이트
   ['primary','dark','card'].forEach(k=>{
     const el=v('color-'+k); if(el) { const span=v('color-'+k+'-val'); if(span) span.textContent=el.value; }
   });
@@ -689,10 +704,15 @@ function update(){
     const el=v('grad-'+k); if(el) { const span=v('grad-'+k+'-val'); if(span) span.textContent=el.value; }
   });
   const frame = v('email-frame');
-frame.innerHTML = '';          // 먼저 완전히 비우고
-frame.innerHTML = buildHTML(); // 새로 렌더링
-const isMob = frame.classList.contains('mobile');
-applyMobileCardStyles(isMob);
+  frame.innerHTML = '';
+  frame.innerHTML = buildHTML();
+  // 로고 img src를 innerHTML 밖에서 별도 세팅 (SVG DOM 파싱 방지)
+  if(window._logoDataURL){
+    const logoImg = frame.querySelector('img[src="__LOGO_PLACEHOLDER__"]');
+    if(logoImg) logoImg.src = window._logoDataURL;
+  }
+  const isMob = frame.classList.contains('mobile');
+  applyMobileCardStyles(isMob);
 }
 
 function getFullHTML(){
@@ -730,6 +750,16 @@ function copyHTML(){
   }
 }
 
+
+
+function downloadHTML(){
+  const blob = new Blob([getFullHTML()], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'megainfo_email_template.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
 
 // 기본 프리셋 주입 (최초 1회)
 (function(){
